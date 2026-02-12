@@ -366,7 +366,7 @@ async function animateEntry() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     setRandomTagline();
-    const [_] = await Promise.all([animateEntry(), loadCorpus()]);
+    await Promise.all([animateEntry(), loadCorpus(), SyllableCounter.loadDictionary()]);
     await sleep(300);
     generateHaiku();
 });

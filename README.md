@@ -4,17 +4,11 @@
 
 ---
 
-*court docs become verse*
-*five syllables, then seven*
-*serenity now*
+*court docs become verse*&nbsp;&nbsp;&nbsp;&nbsp;*five syllables, then seven*&nbsp;&nbsp;&nbsp;&nbsp;*serenity now*
 
-*the flight logs revealed*
-*transformed to gentle haiku*
-*wellness through evidence*
+*the flight logs revealed*&nbsp;&nbsp;&nbsp;&nbsp;*transformed to gentle haiku*&nbsp;&nbsp;&nbsp;&nbsp;*wellness through evidence*
 
-*sealed files, now unsealed*
-*rearranged as poetry*
-*namaste, bastard*
+*sealed files, now unsealed*&nbsp;&nbsp;&nbsp;&nbsp;*rearranged as poetry*&nbsp;&nbsp;&nbsp;&nbsp;*namaste, bastard*
 
 ---
 

@@ -335,9 +335,9 @@ body {
             0 0 40px 20px rgba(247, 243, 238, 0.9);
     }
 
-    .layer-1, .layer-1.loaded { opacity: 0.4; }
-    .layer-2, .layer-2.loaded { opacity: 0.4; }
-    .layer-3, .layer-3.loaded { opacity: 0.4; }
+    .layer-1, .layer-1.loaded { opacity: 0.4; left: 0; width: 100%; }
+    .layer-2, .layer-2.loaded { opacity: 0; }
+    .layer-3, .layer-3.loaded { opacity: 0; }
 
     .haiku-line {
         font-size: 1.25rem;

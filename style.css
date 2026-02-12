@@ -32,6 +32,7 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
     position: relative;
 }
@@ -119,6 +120,7 @@ body {
     position: relative;
     z-index: 2;
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;

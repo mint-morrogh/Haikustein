@@ -1,13 +1,7 @@
-/**
- * Haiku generator: picks random phrases from the Epstein document corpus
- * and assembles them into proper 5-7-5 syllable haikus.
- */
-
 let phraseBank = [];
 let wordBank = [];
 let isLoaded = false;
 
-// ===== TAGLINES =====
 const TAGLINES = [
     "found poetry from sealed places",
     "five, seven, five to life",
@@ -42,8 +36,6 @@ function setRandomTagline() {
     }
 }
 
-// ===== DATA LOADING =====
-
 async function loadCorpus() {
     try {
         const response = await fetch('phrases.json');
@@ -51,21 +43,17 @@ async function loadCorpus() {
         phraseBank = data.phrases || [];
         wordBank = data.words || [];
         isLoaded = true;
-        console.log(`Loaded ${phraseBank.length} phrases, ${wordBank.length} words`);
         initBackgroundText(data.backgroundSnippets || phraseBank.slice(0, 500));
     } catch (err) {
-        console.error('Failed to load corpus:', err);
-        // Fallback: try loading from text file
         try {
             const response = await fetch('phrases.txt');
             const text = await response.text();
             phraseBank = text.split('\n').filter(l => l.trim().length > 3);
             wordBank = extractWords(phraseBank);
             isLoaded = true;
-            console.log(`Loaded ${phraseBank.length} phrases from text`);
             initBackgroundText(phraseBank.slice(0, 500));
         } catch (err2) {
-            console.error('Failed to load any corpus:', err2);
+            console.error('Failed to load corpus:', err2);
         }
     }
 }
@@ -83,24 +71,19 @@ function extractWords(phrases) {
     return Array.from(words);
 }
 
-// ===== BACKGROUND SCROLLING TEXT =====
-
 function initBackgroundText(snippets) {
     const layers = document.querySelectorAll('.bg-scroll-layer');
     const chunkSize = Math.ceil(snippets.length / layers.length);
-    // Target scroll speed: ~15 pixels per second (very serene)
     const PIXELS_PER_SECOND = 15;
 
     layers.forEach((layer, i) => {
         const start = i * chunkSize;
         const chunk = snippets.slice(start, start + chunkSize);
-        // Double the content so the scroll loop is seamless
         const text = chunk.join('  \u00B7  ');
         layer.textContent = text + '  \u00B7  ' + text;
 
-        // Calculate duration based on actual content height
         requestAnimationFrame(() => {
-            const contentHeight = layer.scrollHeight / 2; // half because we duplicated
+            const contentHeight = layer.scrollHeight / 2;
             const duration = Math.max(contentHeight / PIXELS_PER_SECOND, 120);
             layer.style.animationDuration = `${duration}s`;
             layer.classList.add('loaded');
@@ -108,9 +91,6 @@ function initBackgroundText(snippets) {
     });
 }
 
-// ===== HAIKU GENERATION =====
-
-// Words that should NOT end a line (dangling prepositions, articles, conjunctions)
 const BAD_ENDINGS = new Set([
     'the', 'a', 'an', 'and', 'or', 'but', 'of', 'to', 'in', 'on', 'at',
     'by', 'for', 'with', 'from', 'as', 'is', 'was', 'were', 'are', 'be',
@@ -125,7 +105,6 @@ const BAD_ENDINGS = new Set([
     'me', 'him', 'us', 'them', 'some', 'any', 'each', 'every',
 ]);
 
-// Words that should NOT start a line
 const BAD_STARTS = new Set([
     'and', 'or', 'but', 'so', 'yet', 'nor', 'for',
 ]);
@@ -146,19 +125,12 @@ function randomChoice(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-/**
- * Build a line with exactly the target syllable count.
- * Lines must end on a "strong" word (noun, verb, adjective)
- * and not start with a conjunction.
- */
 function buildLine(targetSyllables, maxAttempts = 300) {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        // Strategy 1: Try to find a phrase subset that matches exactly
         if (phraseBank.length > 0) {
             const phrase = randomChoice(phraseBank);
             const words = phrase.split(/\s+/).filter(w => w.replace(/[^a-zA-Z]/g, ''));
 
-            // Try the whole phrase
             if (SyllableCounter.countPhraseSyllables(phrase) === targetSyllables) {
                 const cleaned = cleanPhrase(phrase);
                 const cWords = cleaned.split(/\s+/);
@@ -167,7 +139,6 @@ function buildLine(targetSyllables, maxAttempts = 300) {
                 }
             }
 
-            // Try subsets of consecutive words from this phrase
             for (let start = 0; start < words.length; start++) {
                 let syllables = 0;
                 let selectedWords = [];
@@ -182,7 +153,7 @@ function buildLine(targetSyllables, maxAttempts = 300) {
                             if (endsWell(selectedWords) && startsWell(selectedWords)) {
                                 return selectedWords.join(' ');
                             }
-                            break; // right count but bad ending, try next start
+                            break;
                         }
                     } else {
                         break;
@@ -191,7 +162,6 @@ function buildLine(targetSyllables, maxAttempts = 300) {
             }
         }
 
-        // Strategy 2: Build word by word, but ensure good ending
         if (attempt > 150 && wordBank.length > 0) {
             let syllables = 0;
             let selectedWords = [];
@@ -202,7 +172,6 @@ function buildLine(targetSyllables, maxAttempts = 300) {
                 const s = SyllableCounter.countSyllables(word);
 
                 if (syllables + s === targetSyllables) {
-                    // Only accept if it ends well
                     if (!BAD_ENDINGS.has(word.toLowerCase())) {
                         selectedWords.push(word);
                         syllables += s;
@@ -211,7 +180,6 @@ function buildLine(targetSyllables, maxAttempts = 300) {
                         stuck++;
                     }
                 } else if (syllables + s < targetSyllables) {
-                    // For non-final words, skip bad starts if it's the first word
                     if (selectedWords.length === 0 && BAD_STARTS.has(word.toLowerCase())) {
                         stuck++;
                         continue;
@@ -230,12 +198,10 @@ function buildLine(targetSyllables, maxAttempts = 300) {
         }
     }
 
-    // Last resort: greedy with ending check
     return buildLineGreedy(targetSyllables);
 }
 
 function buildLineGreedy(target) {
-    // Group words by syllable count for quick lookup
     const bySyllables = {};
     for (const word of wordBank) {
         const s = SyllableCounter.countSyllables(word);
@@ -245,13 +211,11 @@ function buildLineGreedy(target) {
         }
     }
 
-    // Try multiple times to get a good ending
     for (let attempt = 0; attempt < 20; attempt++) {
         let remaining = target;
         const words = [];
 
         while (remaining > 0) {
-            // For the final word, filter to good endings
             if (remaining <= 3 && bySyllables[remaining]) {
                 const goodEndings = bySyllables[remaining].filter(
                     w => !BAD_ENDINGS.has(w.toLowerCase())
@@ -277,7 +241,6 @@ function buildLineGreedy(target) {
             }
             if (options.length === 0) break;
             const pick = randomChoice(options);
-            // Skip bad starts for first word
             if (words.length === 0 && BAD_STARTS.has(pick.word.toLowerCase())) continue;
             words.push(pick.word);
             remaining -= pick.syllables;
@@ -309,11 +272,8 @@ function generateHaikuLines() {
     return { line1, line2, line3 };
 }
 
-// ===== UI INTERACTION =====
-
 async function generateHaiku() {
     const btn = document.getElementById('generate-btn');
-    const card = document.getElementById('haiku-card');
     const line1El = document.getElementById('line1');
     const line2El = document.getElementById('line2');
     const line3El = document.getElementById('line3');
@@ -324,19 +284,15 @@ async function generateHaiku() {
         return;
     }
 
-    // Disable button during animation
     btn.classList.add('generating');
 
-    // === PHASE 1: Fade out everything simultaneously ===
     sourceEl.classList.remove('visible');
     line1El.classList.remove('visible');
     line2El.classList.remove('visible');
     line3El.classList.remove('visible');
 
-    // Wait for CSS transition to fully finish (0.5s transition + buffer)
     await sleep(650);
 
-    // === PHASE 2: Swap content while fully invisible ===
     const haiku = generateHaikuLines();
     if (!haiku) {
         btn.classList.remove('generating');
@@ -352,7 +308,6 @@ async function generateHaiku() {
     const s3 = SyllableCounter.countPhraseSyllables(haiku.line3);
     sourceEl.textContent = `${s1} \u2022 ${s2} \u2022 ${s3}`;
 
-    // === PHASE 3: Fade in one line at a time ===
     await sleep(200);
 
     line1El.classList.add('visible');
@@ -367,7 +322,6 @@ async function generateHaiku() {
     await sleep(300);
     sourceEl.classList.add('visible');
 
-    // Re-enable button
     btn.classList.remove('generating');
 }
 
@@ -384,21 +338,17 @@ function waitForTransition(el) {
             }
         }
         el.addEventListener('transitionend', onEnd);
-        // Safety timeout in case transitionend doesn't fire
         setTimeout(resolve, 600);
     });
 }
 
-// ===== ENTRY ANIMATIONS =====
 async function animateEntry() {
-    // Stagger the .entered class to trigger CSS transitions
     const panel = document.querySelector('.content-panel');
     const header = document.querySelector('.header');
     const haikuDisplay = document.querySelector('.haiku-display');
     const btn = document.getElementById('generate-btn');
     const footer = document.querySelector('.footer');
 
-    // Small initial delay to let the page render
     await sleep(100);
 
     panel.classList.add('entered');
@@ -411,16 +361,12 @@ async function animateEntry() {
     await sleep(200);
     footer.classList.add('entered');
 
-    // Wait for the longest transition to finish (1.4s)
     await sleep(1500);
 }
 
-// ===== INIT =====
 document.addEventListener('DOMContentLoaded', async () => {
     setRandomTagline();
-    // Run entry animations and corpus loading in parallel
     const [_] = await Promise.all([animateEntry(), loadCorpus()]);
-    // Generate first haiku after everything has settled
     await sleep(300);
     generateHaiku();
 });

@@ -1,13 +1,5 @@
-/**
- * Syllable counter for English words.
- * Uses a heuristic approach based on vowel patterns, common suffixes,
- * and special cases. Not perfect, but solid enough for haiku generation.
- */
-
 const SyllableCounter = (() => {
-    // Common words with irregular syllable counts
     const EXCEPTIONS = {
-        // 1 syllable
         'the': 1, 'to': 1, 'and': 1, 'a': 1, 'of': 1, 'in': 1, 'is': 1,
         'it': 1, 'for': 1, 'that': 1, 'was': 1, 'on': 1, 'are': 1, 'as': 1,
         'with': 1, 'his': 1, 'they': 1, 'be': 1, 'at': 1, 'one': 1, 'have': 1,
@@ -23,7 +15,6 @@ const SyllableCounter = (() => {
         'does': 1, 'done': 1, 'those': 1, 'these': 1, 'make': 1,
         'called': 1, 'closed': 1, 'claimed': 1, 'forced': 1, 'based': 1,
         'whole': 1, 'while': 1, 'source': 1, 'once': 1,
-        // 2 syllables
         'about': 2, 'over': 2, 'after': 2, 'again': 2, 'also': 2,
         'being': 2, 'before': 2, 'between': 2, 'because': 2, 'under': 2,
         'every': 2, 'people': 2, 'into': 2, 'only': 2, 'order': 2,
@@ -34,28 +25,13 @@ const SyllableCounter = (() => {
         'federal': 3, 'evidence': 3, 'attorney': 3, 'agreement': 3,
         'defendant': 3, 'document': 3, 'documents': 3, 'amendment': 3,
         'unsealed': 2, 'massage': 2, 'travel': 2, 'private': 2,
-        // 3 syllables
         'however': 3, 'another': 3, 'continue': 3, 'government': 3,
         'following': 3, 'pursuant': 3, 'violation': 4, 'deposition': 4,
         'prosecution': 4, 'conspiracy': 4, 'trafficking': 3,
         'allegations': 4, 'investigation': 5,
-        // Legal terms
         'subpoena': 3, 'indictment': 3, 'testimony': 4, 'jurisdiction': 4,
         'confidential': 4, 'proceedings': 3, 'allegation': 4,
     };
-
-    // Suffixes that add syllables
-    const ADD_SYLLABLE_SUFFIXES = [
-        /[^aeiou]ied$/,   // studied
-        /[^td]ed$/,       // waited, but not 'red', 'bed'
-        /[^lnr]es$/,      // watches, but not 'rules', 'scenes'
-    ];
-
-    // Suffixes that don't add syllables (silent e patterns)
-    const SILENT_SUFFIXES = [
-        /[^aeiou]e$/,     // silent e: make, take, etc.
-        /le$/,            // but handle 'le' carefully below
-    ];
 
     function countSyllables(word) {
         if (!word) return 0;
@@ -64,7 +40,6 @@ const SyllableCounter = (() => {
 
         if (!word) return 0;
 
-        // Check exceptions first
         if (EXCEPTIONS[word] !== undefined) {
             return EXCEPTIONS[word];
         }
@@ -73,7 +48,6 @@ const SyllableCounter = (() => {
         const vowels = 'aeiouy';
         let prevIsVowel = false;
 
-        // Count vowel groups
         for (let i = 0; i < word.length; i++) {
             const isVowel = vowels.includes(word[i]);
             if (isVowel && !prevIsVowel) {
@@ -82,22 +56,12 @@ const SyllableCounter = (() => {
             prevIsVowel = isVowel;
         }
 
-        // Adjustments
-
-        // Silent e at end
         if (word.endsWith('e') && !word.endsWith('le') &&
             !word.endsWith('ee') && !word.endsWith('ie') &&
             !word.endsWith('ye') && word.length > 2) {
             count--;
         }
 
-        // -le at end of word after consonant = syllable
-        if (word.length > 2 && word.endsWith('le') &&
-            !vowels.includes(word[word.length - 3])) {
-            // Already counted if preceded by vowel group, don't double count
-        }
-
-        // -ed endings: usually not a syllable unless preceded by t or d
         if (word.endsWith('ed') && word.length > 3) {
             const beforeEd = word[word.length - 3];
             if (beforeEd !== 't' && beforeEd !== 'd') {
@@ -105,36 +69,14 @@ const SyllableCounter = (() => {
             }
         }
 
-        // -es endings: not a syllable after most consonants
-        if (word.endsWith('es') && word.length > 3) {
-            const beforeEs = word[word.length - 3];
-            if (!['s', 'z', 'x', 'ch', 'sh'].some(s => word.endsWith(s + 'es')) &&
-                !vowels.includes(beforeEs)) {
-                // Already handled by vowel counting
-            }
-        }
-
-        // -tion, -sion = 1 syllable
-        if (word.match(/[ts]ion$/)) {
-            // Already correctly counted as 1 vowel group
-        }
-
-        // -ious, -eous = 2 syllables
         if (word.match(/[ie]ous$/)) {
             count++;
         }
 
-        // -ia, -io at end
         if (word.match(/i[ao]$/)) {
             count++;
         }
 
-        // -ual
-        if (word.match(/ual$/)) {
-            // Usually 2 syllables: actual, sexual, etc.
-        }
-
-        // Minimum 1 syllable
         return Math.max(1, count);
     }
 

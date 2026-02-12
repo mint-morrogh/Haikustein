@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haikustein</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Scrolling background text layers -->
+    <div class="bg-scroll-container" aria-hidden="true">
+        <div class="bg-scroll-layer layer-1"></div>
+        <div class="bg-scroll-layer layer-2"></div>
+        <div class="bg-scroll-layer layer-3"></div>
+    </div>
+
+    <!-- Soft gradient overlay -->
+    <div class="gradient-overlay"></div>
+
+    <!-- Main content -->
+    <main class="content">
+        <div class="content-panel">
+            <header class="header">
+                <h1 class="title">Haikustein</h1>
+                <p class="subtitle" id="tagline"></p>
+            </header>
+
+            <section class="haiku-display" id="haiku-display">
+                <div class="haiku-card" id="haiku-card">
+                    <div class="haiku-line line-1" id="line1"></div>
+                    <div class="haiku-line line-2" id="line2"></div>
+                    <div class="haiku-line line-3" id="line3"></div>
+                </div>
+                <p class="haiku-source" id="haiku-source"></p>
+            </section>
+
+            <button class="generate-btn" id="generate-btn" onclick="generateHaiku()">
+                <span class="btn-text">Generate Haiku</span>
+            </button>
+
+            <footer class="footer">
+                <p>sourced from public court records</p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="syllable.js"></script>
+    <script src="haiku.js"></script>
+</body>
+</html>

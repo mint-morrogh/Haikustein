@@ -3,36 +3,57 @@ let wordBank = [];
 let isLoaded = false;
 
 const TAGLINES = [
-    "found poetry from sealed places",
     "five, seven, five to life",
-    "the documents speak in verse",
-    "where redactions become stanzas",
-    "court-ordered tranquility",
     "declassified one syllable at a time",
     "evidence has never been this elegant",
     "legally obtained. poetically arranged.",
     "what the foia intended",
-    "finding inner peace in public records",
     "exhibit a in the art of calm",
     "unsealed for your enlightenment",
     "the most relaxing use of federal documents",
-    "mindfulness through court filings",
     "therapeutic jurisprudence, literally",
     "depositions, distilled",
-    "inhale testimony, exhale verdict",
     "every redaction is a pause for reflection",
-    "the flight log of the soul",
     "putting the zen in subpoena",
     "namaste in the court of law",
     "plea deals in iambic pentameter, almost",
     "wellness content from unwellness documents",
-    "classified serenity, now declassified",
+    "poetry in motion to dismiss",
+    "the prosecution rests, peacefully",
+    "you have the right to remain poetic",
+    "journaling, but make it judicial",
+    "breathwork from the discovery phase",
+    "a breathing exercise in five counts",
+    "motion to find inner peace",
+    "curated from the worst people alive",
+    "om mani padme subpoena",
+    "your honor, may i present this haiku",
+    "objection overruled, poem sustained",
+    "syllables under oath",
+    "sworn affidavits of inner peace",
+    "self-care through federal indictments",
+    "the black book, now a chapbook",
+    "entered into the record, beautifully",
+    "art from the age of impunity",
+    "the worst poetry source material ever",
+    "poetry won't fix this, but here we are",
 ];
 
 function setRandomTagline() {
     const el = document.getElementById('tagline');
     if (el) {
-        el.textContent = TAGLINES[Math.floor(Math.random() * TAGLINES.length)];
+        const tagline = TAGLINES[Math.floor(Math.random() * TAGLINES.length)];
+        el.textContent = tagline;
+        if (tagline.length > 40) {
+            el.style.fontSize = '0.65rem';
+            el.style.letterSpacing = '0.2em';
+        } else if (tagline.length > 32) {
+            el.style.fontSize = '0.75rem';
+            el.style.letterSpacing = '0.25em';
+        } else {
+            el.style.fontSize = '';
+            el.style.letterSpacing = '';
+        }
     }
 }
 

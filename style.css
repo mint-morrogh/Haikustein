@@ -148,6 +148,7 @@ body {
 
 .content-panel.entered {
     opacity: 1;
+    transform: translateY(-3%);
 }
 
 .header {

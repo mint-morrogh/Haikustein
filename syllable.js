@@ -70,9 +70,17 @@ const SyllableCounter = (() => {
         return total;
     }
 
+    function isKnownWord(word) {
+        if (!word) return false;
+        word = word.toLowerCase().trim().replace(/[^a-z]/g, '');
+        if (!word) return false;
+        return cmuDict !== null && cmuDict[word] !== undefined;
+    }
+
     return {
         loadDictionary,
         countSyllables,
-        countPhraseSyllables
+        countPhraseSyllables,
+        isKnownWord
     };
 })();

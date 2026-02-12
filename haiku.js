@@ -41,7 +41,7 @@ async function loadCorpus() {
         const response = await fetch('phrases.json');
         const data = await response.json();
         phraseBank = data.phrases || [];
-        wordBank = data.words || [];
+        wordBank = (data.words || []).filter(w => SyllableCounter.isKnownWord(w));
         isLoaded = true;
         initBackgroundText(data.backgroundSnippets || phraseBank.slice(0, 500));
     } catch (err) {
@@ -109,6 +109,14 @@ const BAD_STARTS = new Set([
     'and', 'or', 'but', 'so', 'yet', 'nor', 'for',
 ]);
 
+function allWordsKnown(words) {
+    for (const word of words) {
+        const clean = word.toLowerCase().replace(/[^a-z]/g, '');
+        if (clean && !SyllableCounter.isKnownWord(clean)) return false;
+    }
+    return true;
+}
+
 function endsWell(words) {
     if (words.length === 0) return false;
     const lastWord = words[words.length - 1].toLowerCase().replace(/[^a-z]/g, '');
@@ -134,7 +142,7 @@ function buildLine(targetSyllables, maxAttempts = 300) {
             if (SyllableCounter.countPhraseSyllables(phrase) === targetSyllables) {
                 const cleaned = cleanPhrase(phrase);
                 const cWords = cleaned.split(/\s+/);
-                if (endsWell(cWords) && startsWell(cWords)) {
+                if (endsWell(cWords) && startsWell(cWords) && allWordsKnown(cWords)) {
                     return cleaned;
                 }
             }
@@ -150,7 +158,7 @@ function buildLine(targetSyllables, maxAttempts = 300) {
                         syllables += s;
                         selectedWords.push(word);
                         if (syllables === targetSyllables && selectedWords.length >= 2) {
-                            if (endsWell(selectedWords) && startsWell(selectedWords)) {
+                            if (endsWell(selectedWords) && startsWell(selectedWords) && allWordsKnown(selectedWords)) {
                                 return selectedWords.join(' ');
                             }
                             break;
@@ -192,7 +200,8 @@ function buildLine(targetSyllables, maxAttempts = 300) {
             }
 
             if (syllables === targetSyllables && selectedWords.length >= 2
-                && endsWell(selectedWords) && startsWell(selectedWords)) {
+                && endsWell(selectedWords) && startsWell(selectedWords)
+                && allWordsKnown(selectedWords)) {
                 return selectedWords.join(' ');
             }
         }
@@ -246,7 +255,7 @@ function buildLineGreedy(target) {
             remaining -= pick.syllables;
         }
 
-        if (endsWell(words) && startsWell(words)) {
+        if (endsWell(words) && startsWell(words) && allWordsKnown(words)) {
             return words.join(' ');
         }
     }
